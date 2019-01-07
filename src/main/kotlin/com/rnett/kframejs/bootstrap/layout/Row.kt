@@ -4,6 +4,7 @@ import com.rnett.kframejs.dom.div
 import com.rnett.kframejs.structure.addons.HasClass
 import com.rnett.kframejs.structure.element.*
 import org.w3c.dom.HTMLDivElement
+import kotlin.properties.Delegates
 
 
 enum class RowVerticalAlignment(override val klass: String) : HasClass {
@@ -24,6 +25,20 @@ enum class RowHorizontalAlignment(override val klass: String) : HasClass {
 class Row(parent: CanHaveElement<*>) : DisplayElement<Row, HTMLDivElement>("div", parent) {
     var verticalAlignment by classes.by<RowVerticalAlignment>()
     var horizontalAlignment by classes.by<RowHorizontalAlignment>()
+    var gutters: Boolean
+        get() = "no-gutters" !in classes
+        set(value) {
+            if (value)
+                classes.remove("no-gutters")
+            else
+                if ("no-gutters" !in classes)
+                    classes.add("no-gutters")
+        }
+    var order: Int? by Delegates.observable<Int?>(null) { _, _, new ->
+        classes.removeAll { "order-" in it }
+        if (new != null)
+            classes.add("order-$new")
+    }
 }
 
 @KFrameElementDSL
